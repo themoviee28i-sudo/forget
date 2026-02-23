@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product - Bakery Shop Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-lg" style="border-radius: 15px; border: none;">
+            <div class="card-header" style="background-color: #6f4e37; color: white; border-radius: 15px 15px 0 0;">
+                <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Product</h5>
+            </div>
+            <div class="card-body p-5">
+                {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_product') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label" style="color: #6f4e37; font-weight: 600;">
+                            <i class="fas fa-cupcake"></i> Product Name
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="name" name="name" 
+                               placeholder="e.g., Chocolate Cake, Croissant" required style="border-radius: 10px; border: 2px solid #ddd;">
+                        <small class="text-muted">Enter the name of your product</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="price" class="form-label" style="color: #6f4e37; font-weight: 600;">
+                            <i class="fas fa-dollar-sign"></i> Price (USD)
+                        </label>
+                        <input type="number" class="form-control form-control-lg" id="price" name="price" 
+                               placeholder="e.g., 5.99" step="0.01" min="0" required style="border-radius: 10px; border: 2px solid #ddd;">
+                        <small class="text-muted">Enter the selling price</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="image" class="form-label" style="color: #6f4e37; font-weight: 600;">
+                            <i class="fas fa-image"></i> Product Image
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*" style="border-radius: 10px; border: 2px solid #ddd;">
+                            <span class="input-group-text" style="border-radius: 10px; background-color: #f8f6f1; border: 2px solid #ddd;">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            Allowed formats: PNG, JPG, JPEG, GIF (Max 16MB)
+                        </small>
+                        <small class="text-muted d-block">Image is optional but recommended</small>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

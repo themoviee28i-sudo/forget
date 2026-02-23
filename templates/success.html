@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed - Bakery Shop{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-lg" style="border-radius: 15px; border: none; text-align: center; padding: 60px 30px;">
+            <div style="font-size: 80px; color: #4caf50; margin-bottom: 20px;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <h1 style="color: #6f4e37; font-weight: bold; margin-bottom: 10px;">
+                Order Confirmed!
+            </h1>
+
+            <p class="text-muted mb-4" style="font-size: 1.1rem;">
+                Thank you for your delicious order
+            </p>
+
+            <div class="card mb-4" style="background: linear-gradient(135deg, #f8f6f1 0%, #f0ebe5 100%); border: 2px solid #d4a574; border-radius: 10px;">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <p style="color: #999; margin-bottom: 5px;">Order ID</p>
+                        <h4 style="color: #6f4e37; font-weight: bold; margin-bottom: 0;">
+                            #{{ order_id }}
+                        </h4>
+                    </div>
+                    <hr style="color: #ddd;">
+                    <div class="mb-3">
+                        <p style="color: #999; margin-bottom: 5px;">Order Total</p>
+                        <h3 style="color: #d4a574; font-weight: bold; margin-bottom: 0;">
+                            ${{ "%.2f"|format(total) }}
+                        </h3>
+                    </div>
+                    <hr style="color: #ddd;">
+                    <div>
+                        <p style="color: #999; margin-bottom: 5px;">Payment Method</p>
+                        <p style="color: #6f4e37; font-weight: 600; margin-bottom: 0;">
+                            {% if payment_method == 'Cash' %}
+                                <i class="fas fa-money-bill-wave" style="color: #d4a574; margin-right: 8px;"></i>
+                                Cash on Delivery
+                            {% elif payment_method == 'Bank Transfer' %}
+                                <i class="fas fa-university" style="color: #d4a574; margin-right: 8px;"></i>
+                                Bank Transfer
+                            {% else %}
+                                <i class="fas fa-qrcode" style="color: #d4a574; margin-right: 8px;"></i>
+                                QR Code Payment
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-envelope" style="margin-right: 10px;"></i>
+                <strong>Confirmation email</strong> has been sent to your email address.<br>
+                <small>Check your inbox for order details and tracking information.</small>
+            </div>
+
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-truck" style="margin-right: 10px;"></i>
+                <strong>Expected Delivery:</strong> 2-3 business days<br>
+                <small>Your delicious baked goods will be fresh and ready!</small>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="https://www.facebook.com" target="_blank" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-share-alt"></i> Share Order
+                </a>
+            </div>
+
+            <hr style="color: #ddd; margin-top: 40px; margin-bottom: 20px;">
+
+            <p style="color: #999; font-size: 0.9rem; margin: 0;">
+                <i class="fas fa-question-circle"></i> Have questions? 
+                <a href="mailto:support@bakerybshop.com" style="color: #d4a574; text-decoration: none;">Contact us</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

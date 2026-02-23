@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Orders - Bakery Shop Admin{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 style="color: #6f4e37; font-weight: bold;">
+            <i class="fas fa-list-alt"></i> All Orders
+        </h1>
+        <p class="text-muted">Manage and track all customer orders</p>
+    </div>
+</div>
+
+<div class="card shadow-sm" style="border-radius: 15px; border: none;">
+    <div class="card-header" style="background-color: #6f4e37; color: white; border-radius: 15px 15px 0 0;">
+        <h5 class="mb-0"><i class="fas fa-shopping-bag"></i> Order List</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if orders %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background-color: #f8f6f1;">
+                        <tr>
+                            <th style="color: #6f4e37; font-weight: 600;">Order ID</th>
+                            <th style="color: #6f4e37; font-weight: 600;">Customer</th>
+                            <th style="color: #6f4e37; font-weight: 600;">Email</th>
+                            <th style="color: #6f4e37; font-weight: 600;">Items</th>
+                            <th style="color: #6f4e37; font-weight: 600;">Total</th>
+                            <th style="color: #6f4e37; font-weight: 600;">Payment Method</th>
+                            <th style="color: #6f4e37; font-weight: 600;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="vertical-align: middle; color: #6f4e37; font-weight: bold;">
+                                    #{{ order['id'] }}
+                                </td>
+                                <td style="vertical-align: middle; color: #6f4e37;">
+                                    {{ order['customer_name'] or 'N/A' }}
+                                </td>
+                                <td style="vertical-align: middle; color: #999; font-size: 0.9rem;">
+                                    {{ order['customer_email'] or 'N/A' }}
+                                </td>
+                                <td style="vertical-align: middle; color: #6f4e37; font-size: 0.9rem; max-width: 250px;">
+                                    <small>{{ order['items'] }}</small>
+                                </td>
+                                <td style="vertical-align: middle; color: #d4a574; font-weight: bold;">
+                                    ${{ "%.2f"|format(order['total']) }}
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    {% if order['payment_method'] == 'Cash' %}
+                                        <span class="badge" style="background-color: #28a745; color: white;">
+                                            <i class="fas fa-money-bill-wave"></i> Cash
+                                        </span>
+                                    {% elif order['payment_method'] == 'Bank Transfer' %}
+                                        <span class="badge" style="background-color: #007bff; color: white;">
+                                            <i class="fas fa-university"></i> Transfer
+                                        </span>
+                                    {% else %}
+                                        <span class="badge" style="background-color: #6f4e37; color: white;">
+                                            <i class="fas fa-qrcode"></i> QR
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td style="vertical-align: middle; color: #999; font-size: 0.9rem;">
+                                    {{ order['created_at'][:10] }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info m-4" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <strong>No orders yet!</strong> Customers will place orders here.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm" style="border-radius: 15px; border: none; background: linear-gradient(135deg, #d4a574 0%, #c49362 100%); color: white;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Orders</h5>
+                <h2 style="font-size: 2.5rem; font-weight: bold;">{{ orders|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm" style="border-radius: 15px; border: none; background: linear-gradient(135deg, #6f4e37 0%, #5f4432 100%); color: white;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Revenue</h5>
+                <h2 style="font-size: 2.5rem; font-weight: bold;">
+                    $
+                    {% set total_revenue = 0 %}
+                    {% for order in orders %}
+                        {% set total_revenue = total_revenue + order['total'] %}
+                    {% endfor %}
+                    {{ "%.2f"|format(total_revenue) }}
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm" style="border-radius: 15px; border: none; background: linear-gradient(135deg, #8b6f47 0%, #6f5a3a 100%); color: white;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Average Order</h5>
+                <h2 style="font-size: 2.5rem; font-weight: bold;">
+                    $
+                    {% set avg_order = 0 %}
+                    {% if orders %}
+                        {% set total_revenue = 0 %}
+                        {% for order in orders %}
+                            {% set total_revenue = total_revenue + order['total'] %}
+                        {% endfor %}
+                        {% set avg_order = total_revenue / (orders|length) %}
+                        {{ "%.2f"|format(avg_order) }}
+                    {% else %}
+                        0.00
+                    {% endif %}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - Bakery Shop{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 style="color: #6f4e37; font-weight: bold;">
+            <i class="fas fa-shopping-cart"></i> Your Shopping Cart
+        </h1>
+        <p class="text-muted">Review your items before checkout</p>
+    </div>
+</div>
+
+{% if cart %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm" style="border-radius: 15px; border: none;">
+                <div class="card-header" style="background-color: #6f4e37; color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Cart Items ({{ cart|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% set total = 0 %}
+                    {% for product_id, item in cart.items() %}
+                        {% set item_total = item['price'] * item['quantity'] %}
+                        {% set total = total + item_total %}
+                        <div class="border-bottom p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    {% if item['image'] %}
+                                        <img src="{{ url_for('static', filename='uploads/' + item['image']) }}" 
+                                             alt="{{ item['name'] }}" 
+                                             style="width: 100%; border-radius: 10px;">
+                                    {% else %}
+                                        <div style="width: 100%; padding-top: 100%; position: relative; background-color: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image" style="color: #999; font-size: 30px;"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h5 style="color: #6f4e37; font-weight: 600; margin-bottom: 5px;">{{ item['name'] }}</h5>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        <strong style="color: #d4a574;">${{ "%.2f"|format(item['price']) }}</strong> each
+                                    </p>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity({{ product_id }}, {{ item['quantity'] - 1 }})">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="text" class="form-control text-center" value="{{ item['quantity'] }}" readonly style="border: 1px solid #ddd; border-radius: 0;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity({{ product_id }}, {{ item['quantity'] + 1 }})">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <p style="color: #d4a574; font-weight: bold; font-size: 1.1rem; margin-bottom: 5px;">
+                                        ${{ "%.2f"|format(item_total) }}
+                                    </p>
+                                    <small class="text-muted">{{ item['quantity'] }} x ${{ "%.2f"|format(item['price']) }}</small>
+                                </div>
+                                <div class="col-md-1 text-center">
+                                    <a href="{{ url_for('remove_from_cart', product_id=item['id']) }}" 
+                                       class="btn btn-danger btn-sm" 
+                                       onclick="return confirm('Remove this item?')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm" style="border-radius: 15px; border: none; position: sticky; top: 20px;">
+                <div class="card-header" style="background-color: #6f4e37; color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0"><i class="fas fa-receipt"></i> Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% set total = 0 %}
+                    {% for item in cart.values() %}
+                        {% set total = total + (item['price'] * item['quantity']) %}
+                    {% endfor %}
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span style="color: #6f4e37; font-weight: 600;">${{ "%.2f"|format(total) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping:</span>
+                            <span style="color: #6f4e37; font-weight: 600;">Free</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax:</span>
+                            <span style="color: #6f4e37; font-weight: 600;">$0.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between" style="font-size: 1.3rem;">
+                            <strong style="color: #6f4e37;">Total:</strong>
+                            <strong style="color: #d4a574;">${{ "%.2f"|format(total) }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-credit-card"></i> Proceed to Checkout
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-shopping-bag"></i> Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateQuantity(productId, newQuantity) {
+            if (newQuantity <= 0) {
+                if (confirm('Remove this item?')) {
+                    window.location.href = `/remove_from_cart/${productId}`;
+                }
+                return;
+            }
+            
+            fetch('/update_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: newQuantity
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      location.reload();
+                  }
+              });
+        }
+    </script>
+
+{% else %}
+    <div class="alert alert-info text-center" style="padding: 60px 20px; border-radius: 15px;">
+        <i class="fas fa-shopping-cart" style="font-size: 50px; color: #d4a574; margin-bottom: 20px;"></i>
+        <h4 style="color: #6f4e37; font-weight: bold;">Your cart is empty</h4>
+        <p class="text-muted mb-4">Add some delicious baked goods to your cart!</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-bag"></i> Continue Shopping
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
